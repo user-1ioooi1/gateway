@@ -1,0 +1,5 @@
+add_subdirectory(fake)
+add_subdirectory(modbus)  
+add_subdirectory(mqtt)
+add_subdirectory(can)
+add_subdirectory(processor)

@@ -1,0 +1,85 @@
+{
+    "gateway_id": "gw-imx6ull-001",
+    "log_level": 0,
+    "plugins": [
+        {
+            "type": "south",
+            "name": "modbus",
+            "so_path": "plugins/libmodbus_plugin.so",
+            "config": {
+                "device": "/dev/pts/5",
+                "baud": 9600,
+                "slave_id": 1,
+                "poll_interval_ms": 2000,
+                "stop_bit" : 1,
+                "data_bit" : 8,
+                "parity" : "N",
+                "response_timeout_s" : 2,
+                "response_timeout_us" : 0,
+                "topic_prefix": "device/modbus",
+                "registers": [
+                    { "addr": 0, "key": "temperature", "unit": "℃", "scale": 0.1 },
+                    { "addr": 1, "key": "humidity",    "unit": "%",  "scale": 0.1 }
+                ]
+            }
+        },
+        {
+            "type": "south",
+            "name": "can",
+            "so_path": "plugins/libcan_plugin.so",
+            "config": {
+                "interface": "vcan0",
+                "rules": [
+                    {
+                        "can_id": 257,
+                        "key": "pressure",
+                        "unit": "kPa",
+                        "topic": "device/can/pressure",
+                        "start_byte": 0,
+                        "length": 2,
+                        "byte_order": "big",
+                        "scale": 0.1
+                    }
+                ]
+            }
+        },
+        {
+            "type": "processor",
+            "name": "processor",
+            "so_path": "plugins/libprocessor_plugin.so",
+            "config": {
+                "subscribe_topics": ["device/#"],
+                "rules": [
+                    {
+                        "topic_filter": "device/+/temperature",
+                        "min": -40,
+                        "max": 26,
+                        "alarm_topic": "alarm/temperature",
+                        "severity": 2
+                    },
+                    {
+                        "topic_filter": "device/+/pressure",
+                        "min": 0,
+                        "max": 100,
+                        "alarm_topic": "alarm/pressure",
+                        "severity": 1
+                    }
+                ]
+            }
+        },
+        {
+            "type": "north",
+            "name": "mqtt",
+            "so_path": "plugins/libmqtt_plugin.so",
+            "config": {
+                "broker_host": "127.0.0.1",
+                "broker_port": 1883,
+                "client_id": "gw-imx6ull-001",
+                "keepalive": 60,
+                "topic_prefix": "gw/001",
+                "qos": 1,
+                "subscribe_topics": ["device/#", "alarm/#"]
+            }
+        }
+    ]
+}
