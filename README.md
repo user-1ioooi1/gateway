@@ -158,3 +158,12 @@ config/
 ```
 
 ---
+
+
+## 第三方库许可证
+
+| 库 | 许可证 | 链接 |
+|----|--------|------|
+| cJSON | MIT | https://github.com/DaveGamble/cJSON |
+| libmodbus | LGPL v2.1 | https://libmodbus.org |
+| Eclipse Mosquitto | EPL 2.0 | https://mosquitto.org |
